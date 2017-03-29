@@ -26,7 +26,7 @@ import org.apache.flink.streaming.api.watermark.Watermark
 import org.apache.flink.streaming.util.StreamingMultipleProgramsTestBase
 import org.apache.flink.table.api.TableEnvironment
 import org.apache.flink.table.api.scala._
-import org.apache.flink.table.api.scala.stream.table.AggregationsITCase.TimestampAndWatermarkWithOffset
+import org.apache.flink.table.api.scala.stream.table.GroupWindowAggregationsITCase.TimestampAndWatermarkWithOffset
 import org.apache.flink.table.api.scala.stream.utils.StreamITCase
 import org.apache.flink.types.Row
 import org.junit.Assert._
@@ -38,7 +38,7 @@ import scala.collection.mutable
   * We only test some aggregations until better testing of constructed DataStream
   * programs is possible.
   */
-class AggregationsITCase extends StreamingMultipleProgramsTestBase {
+class GroupWindowAggregationsITCase extends StreamingMultipleProgramsTestBase {
 
   val data = List(
     (1L, 1, "Hi"),
@@ -160,7 +160,7 @@ class AggregationsITCase extends StreamingMultipleProgramsTestBase {
   }
 }
 
-object AggregationsITCase {
+object GroupWindowAggregationsITCase {
   class TimestampAndWatermarkWithOffset(
     offset: Long) extends AssignerWithPunctuatedWatermarks[(Long, Int, String)] {
 

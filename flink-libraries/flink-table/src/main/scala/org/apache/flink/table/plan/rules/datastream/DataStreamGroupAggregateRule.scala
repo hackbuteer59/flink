@@ -21,22 +21,26 @@ package org.apache.flink.table.plan.rules.datastream
 import org.apache.calcite.plan.{RelOptRule, RelOptRuleCall, RelTraitSet}
 import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
+import org.apache.calcite.rel.logical.LogicalAggregate
 import org.apache.flink.table.api.TableException
 import org.apache.flink.table.plan.nodes.FlinkConventions
-import org.apache.flink.table.plan.nodes.datastream.DataStreamAggregate
-import org.apache.flink.table.plan.nodes.logical.FlinkLogicalWindowAggregate
+import org.apache.flink.table.plan.nodes.datastream.DataStreamGroupAggregate
+import org.apache.flink.table.plan.nodes.logical.FlinkLogicalAggregate
 
 import scala.collection.JavaConversions._
 
-class DataStreamAggregateRule
+/**
+  * Rule to convert a [[LogicalAggregate]] into a [[DataStreamGroupAggregate]].
+  */
+class DataStreamGroupAggregateRule
   extends ConverterRule(
-    classOf[FlinkLogicalWindowAggregate],
+    classOf[FlinkLogicalAggregate],
     FlinkConventions.LOGICAL,
     FlinkConventions.DATASTREAM,
-    "DataStreamAggregateRule") {
+    "DataStreamGroupAggregateRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
-    val agg: FlinkLogicalWindowAggregate = call.rel(0).asInstanceOf[FlinkLogicalWindowAggregate]
+    val agg: FlinkLogicalAggregate = call.rel(0).asInstanceOf[FlinkLogicalAggregate]
 
     // check if we have distinct aggregates
     val distinctAggs = agg.getAggCallList.exists(_.isDistinct)
@@ -54,13 +58,11 @@ class DataStreamAggregateRule
   }
 
   override def convert(rel: RelNode): RelNode = {
-    val agg: FlinkLogicalWindowAggregate = rel.asInstanceOf[FlinkLogicalWindowAggregate]
+    val agg: FlinkLogicalAggregate = rel.asInstanceOf[FlinkLogicalAggregate]
     val traitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.DATASTREAM)
     val convInput: RelNode = RelOptRule.convert(agg.getInput, FlinkConventions.DATASTREAM)
 
-    new DataStreamAggregate(
-      agg.getWindow,
-      agg.getNamedProperties,
+    new DataStreamGroupAggregate(
       rel.getCluster,
       traitSet,
       convInput,
@@ -68,9 +70,10 @@ class DataStreamAggregateRule
       rel.getRowType,
       agg.getInput.getRowType,
       agg.getGroupSet.toArray)
-    }
   }
-
-object DataStreamAggregateRule {
-  val INSTANCE: RelOptRule = new DataStreamAggregateRule
 }
+
+object DataStreamGroupAggregateRule {
+  val INSTANCE: RelOptRule = new DataStreamGroupAggregateRule
+}
+
