@@ -33,7 +33,7 @@ class OverWindowTest extends TableTestBase {
     val result = table
       .window(Over partitionBy 'c orderBy 'rowtime preceding 2.rows as 'w)
       .select('c, 'b.count over 'x)
-    streamUtil.tEnv.optimize(result.getRelNode)
+    streamUtil.tEnv.optimize(result.getRelNode, updatesAsRetraction = true)
   }
 
   @Test(expected = classOf[ValidationException])
@@ -41,7 +41,7 @@ class OverWindowTest extends TableTestBase {
     val result = table
       .window(Over partitionBy 'c orderBy 'abc preceding 2.rows as 'w)
       .select('c, 'b.count over 'w)
-    streamUtil.tEnv.optimize(result.getRelNode)
+    streamUtil.tEnv.optimize(result.getRelNode, updatesAsRetraction = true)
   }
 
   @Test(expected = classOf[ValidationException])
@@ -49,7 +49,7 @@ class OverWindowTest extends TableTestBase {
     val result = table
       .window(Over partitionBy 'c orderBy 'rowtime preceding 2 following "xx" as 'w)
       .select('c, 'b.count over 'w)
-    streamUtil.tEnv.optimize(result.getRelNode)
+    streamUtil.tEnv.optimize(result.getRelNode, updatesAsRetraction = true)
   }
 
   @Test(expected = classOf[ValidationException])
@@ -57,7 +57,7 @@ class OverWindowTest extends TableTestBase {
     val result = table
       .window(Over partitionBy 'c orderBy 'rowtime preceding 2.rows following CURRENT_RANGE as 'w)
       .select('c, 'b.count over 'w)
-    streamUtil.tEnv.optimize(result.getRelNode)
+    streamUtil.tEnv.optimize(result.getRelNode, updatesAsRetraction = true)
   }
 
   @Test(expected = classOf[ValidationException])
@@ -65,7 +65,7 @@ class OverWindowTest extends TableTestBase {
     val result = table
       .window(Over partitionBy 'a + 'b orderBy 'rowtime preceding 2.rows as 'w)
       .select('c, 'b.count over 'w)
-    streamUtil.tEnv.optimize(result.getRelNode)
+    streamUtil.tEnv.optimize(result.getRelNode, updatesAsRetraction = true)
   }
 
   @Test(expected = classOf[ValidationException])
@@ -75,7 +75,7 @@ class OverWindowTest extends TableTestBase {
     val result = table2
       .window(Over partitionBy 'c orderBy 'rowtime preceding 2.rows as 'w)
       .select('c, 'b.count over 'w)
-    streamUtil.tEnv.optimize(result.getRelNode)
+    streamUtil.tEnv.optimize(result.getRelNode, updatesAsRetraction = true)
   }
 
   @Test(expected = classOf[ValidationException])
@@ -83,7 +83,7 @@ class OverWindowTest extends TableTestBase {
     val result = table
       .window(Over orderBy 'rowtime preceding -1.rows as 'w)
       .select('c, 'b.count over 'w)
-    streamUtil.tEnv.optimize(result.getRelNode)
+    streamUtil.tEnv.optimize(result.getRelNode, updatesAsRetraction = true)
   }
 
   @Test(expected = classOf[ValidationException])
@@ -91,7 +91,7 @@ class OverWindowTest extends TableTestBase {
     val result = table
       .window(Over orderBy 'rowtime preceding 1.rows following -2.rows as 'w)
       .select('c, 'b.count over 'w)
-    streamUtil.tEnv.optimize(result.getRelNode)
+    streamUtil.tEnv.optimize(result.getRelNode, updatesAsRetraction = true)
   }
 
   @Test

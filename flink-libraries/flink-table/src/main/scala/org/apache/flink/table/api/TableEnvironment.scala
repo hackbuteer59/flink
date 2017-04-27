@@ -595,7 +595,7 @@ abstract class TableEnvironment(val config: TableConfig) {
         throw new TableException(
           "An input of GenericTypeInfo<Row> cannot be converted to Table. " +
             "Please specify the type of the input with a RowTypeInfo.")
-      case a: AtomicType[A] =>
+      case a: AtomicType[_] =>
         if (exprs.length != 1) {
           throw new TableException("Table of atomic type can only have a single field.")
         }
@@ -656,22 +656,6 @@ abstract class TableEnvironment(val config: TableConfig) {
 
     (fieldNames.toArray, fieldIndexes.toArray)
   }
-
-  /**
-    * Creates a final converter that maps the internal row type to external type.
-    *
-    * @param physicalTypeInfo the input of the sink
-    * @param logicalRowType the logical type with correct field names (esp. for POJO field mapping)
-    * @param requestedTypeInfo the output type of the sink
-    * @param functionName name of the map function. Must not be unique but has to be a
-    *                     valid Java class identifier.
-    */
-  protected def getConversionMapper[IN, OUT](
-      physicalTypeInfo: TypeInformation[IN],
-      logicalRowType: RelDataType,
-      requestedTypeInfo: TypeInformation[OUT],
-      functionName: String):
-    Option[MapFunction[IN, OUT]]
 
   protected def generateRowConverterFunction[OUT](
       inputTypeInfo: TypeInformation[Row],
